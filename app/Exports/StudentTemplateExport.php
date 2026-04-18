@@ -23,8 +23,8 @@ class StudentTemplateExport implements FromArray, WithHeadings, ShouldAutoSize, 
             'nama_lengkap',
             'tempat_lahir',
             'tanggal_lahir',
-            'nama_ortu',
             'program_keahlian',
+            'konsentrasi_keahlian',
             'status_lulus',
             'is_released'
         ];
@@ -39,10 +39,10 @@ class StudentTemplateExport implements FromArray, WithHeadings, ShouldAutoSize, 
                 'Ahmad Fulan',
                 'Jakarta',
                 '2005-08-17',
-                'Bapak Fulan',
                 'IPA',
+                'Kimia Industri',
                 'Lulus',
-                '1'
+                '0'
             ],
             [
                 '0012345679',
@@ -50,10 +50,10 @@ class StudentTemplateExport implements FromArray, WithHeadings, ShouldAutoSize, 
                 'Siti Sarah',
                 'Bandung',
                 '2006-01-20',
-                'Ibu Sarah',
                 'IPS',
+                'Akuntansi',
                 'Belum Lulus',
-                '1'
+                '0'
             ]
         ];
     }
@@ -96,9 +96,12 @@ class StudentTemplateExport implements FromArray, WithHeadings, ShouldAutoSize, 
                 $sheet->getComment('A1')->getText()->createTextRun('Wajib diisi, hanya angka (misal: 0012345678) dan Unik.');
                 $sheet->getComment('B1')->getText()->createTextRun('Opsional (misal: 1001)');
                 $sheet->getComment('C1')->getText()->createTextRun('Wajib diisi, berisi nama peserta didik.');
+                $sheet->getComment('D1')->getText()->createTextRun('Wajib diisi, tempat lahir (misal: Jakarta).');
                 $sheet->getComment('E1')->getText()->createTextRun('Wajib diisi, format tanggal YYYY-MM-DD (Misal: 2005-08-17).');
+                $sheet->getComment('F1')->getText()->createTextRun('Opsional, Program Keahlian (misal: Teknik Mesin).');
+                $sheet->getComment('G1')->getText()->createTextRun('Opsional, Konsentrasi Keahlian (misal: Teknik Kendaraan Ringan).');
                 $sheet->getComment('H1')->getText()->createTextRun('Wajib diisi, tulis "Lulus", "1", atau "0", "Belum Lulus".');
-                $sheet->getComment('I1')->getText()->createTextRun('Status rilis akses SKL. Isi "1" untuk rilis (default) atau "0" untuk ditahan.');
+                $sheet->getComment('I1')->getText()->createTextRun('Status rilis akses SKL. Isi "1" untuk rilis atau "0" untuk ditahan (default: 0).');
                 
                 // Adjust row dimension for header
                 $sheet->getRowDimension(1)->setRowHeight(25);

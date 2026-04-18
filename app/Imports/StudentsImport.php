@@ -37,11 +37,11 @@ class StudentsImport implements ToModel, WithHeadingRow
             'nama_lengkap'     => $row['nama_lengkap'] ?? 'Tanpa Nama',
             'tempat_lahir'     => $row['tempat_lahir'] ?? 'Tidak Diketahui',
             'tanggal_lahir'    => $tanggal_lahir,
-            'nama_ortu'        => $row['nama_ortu'] ?? null,
             'program_keahlian' => $row['program_keahlian'] ?? null,
+            'konsentrasi_keahlian' => $row['konsentrasi_keahlian'] ?? null,
             'status_lulus'     => ((string)($row['status_lulus'] ?? '0') === '1' || strtolower($row['status_lulus'] ?? '') === 'lulus') ? 1 : 0,
             'academic_year_id' => $activeYear ? $activeYear->id : null,
-            'is_released'      => ((string)($row['is_released'] ?? '1') !== '0'),
+            'is_released'      => ((string)($row['is_released'] ?? '0') !== '0') ? 1 : 0,
         ]);
     }
 }

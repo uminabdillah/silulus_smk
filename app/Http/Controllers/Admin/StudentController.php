@@ -52,13 +52,13 @@ class StudentController extends Controller
             'nama_lengkap' => 'required|string|max:255',
             'tempat_lahir' => 'required|string|max:255',
             'tanggal_lahir' => 'required|date',
-            'nama_ortu' => 'nullable|string|max:255',
             'program_keahlian' => 'nullable|string|max:255',
+            'konsentrasi_keahlian' => 'nullable|string|max:255',
             'status_lulus' => 'required|boolean',
-            'is_released' => 'required|boolean',
         ]);
 
         $validated['academic_year_id'] = $activeYear->id;
+        $validated['is_released'] = 0;
 
         Student::create($validated);
 
@@ -97,10 +97,9 @@ class StudentController extends Controller
             'nama_lengkap' => 'required|string|max:255',
             'tempat_lahir' => 'required|string|max:255',
             'tanggal_lahir' => 'required|date',
-            'nama_ortu' => 'nullable|string|max:255',
             'program_keahlian' => 'nullable|string|max:255',
+            'konsentrasi_keahlian' => 'nullable|string|max:255',
             'status_lulus' => 'required|boolean',
-            'is_released' => 'required|boolean',
         ]);
 
         $student->update($validated);

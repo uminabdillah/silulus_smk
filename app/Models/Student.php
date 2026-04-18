@@ -14,6 +14,7 @@ class Student extends Model
         'tanggal_lahir',
         'nama_ortu',
         'program_keahlian',
+        'konsentrasi_keahlian',
         'status_lulus',
         'academic_year_id',
         'is_released'

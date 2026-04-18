@@ -45,15 +45,15 @@
                             </div>
 
                             <div>
-                                <label for="nama_ortu" class="block text-sm font-medium text-gray-700 mb-1">Nama Orang Tua</label>
-                                <input type="text" name="nama_ortu" id="nama_ortu" value="{{ old('nama_ortu', $student->nama_ortu) }}" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                @error('nama_ortu') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                            </div>
-
-                            <div>
                                 <label for="program_keahlian" class="block text-sm font-medium text-gray-700 mb-1">Program Keahlian</label>
                                 <input type="text" name="program_keahlian" id="program_keahlian" value="{{ old('program_keahlian', $student->program_keahlian) }}" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                 @error('program_keahlian') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                            </div>
+
+                            <div>
+                                <label for="konsentrasi_keahlian" class="block text-sm font-medium text-gray-700 mb-1">Konsentrasi Keahlian</label>
+                                <input type="text" name="konsentrasi_keahlian" id="konsentrasi_keahlian" value="{{ old('konsentrasi_keahlian', $student->konsentrasi_keahlian) }}" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                @error('konsentrasi_keahlian') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                             </div>
 
                             <div>

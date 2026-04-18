@@ -143,7 +143,7 @@
                                     <th class="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-widest">No</th>
                                     <th class="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-widest">NISN</th>
                                     <th class="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-widest">Nama</th>
-                                    <th class="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-widest">Program</th>
+                                    <th class="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-widest">Keahlian</th>
                                     <th class="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-widest">Status</th>
                                     <th class="px-6 py-4 text-center text-xs font-bold text-gray-400 uppercase tracking-widest">Akses</th>
                                     <th class="px-6 py-4 text-center text-xs font-bold text-gray-400 uppercase tracking-widest">Aksi</th>
@@ -158,7 +158,10 @@
                                         <td class="px-6 py-4 text-sm font-medium text-gray-400 border-none">{{ $students->firstItem() + $key }}</td>
                                         <td class="px-6 py-4 text-sm font-bold text-gray-500 border-none">{{ $student->nisn }}</td>
                                         <td class="px-6 py-4 text-sm font-bold text-gray-900 border-none">{{ $student->nama_lengkap }}</td>
-                                        <td class="px-6 py-4 text-sm text-gray-500 border-none">{{ $student->program_keahlian ?? '-' }}</td>
+                                        <td class="px-6 py-4 text-sm text-gray-500 border-none">
+                                            <div class="font-bold text-gray-700">{{ $student->program_keahlian ?? '-' }}</div>
+                                            <div class="text-xs text-gray-400">{{ $student->konsentrasi_keahlian ?? '-' }}</div>
+                                        </td>
                                         <td class="px-6 py-4 border-none">
                                             @if($student->status_lulus)
                                                 <span class="inline-flex items-center px-2.5 py-1 rounded text-[10px] font-black bg-emerald-100 text-emerald-800">
