@@ -4,6 +4,12 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Student;
+use App\Models\AcademicYear;
+use App\Models\SchoolProfile;
+use App\Models\Subject;
+use App\Models\Grade;
+use App\Models\MajorProgram;
+use App\Models\Classroom;
 use Illuminate\Http\Request;
 
 class StudentController extends Controller
@@ -35,7 +41,13 @@ class StudentController extends Controller
      */
     public function create()
     {
-        return view('admin.students.create');
+        $school = SchoolProfile::first();
+        $jenjang = $school->jenjang ?? null;
+        $programs = MajorProgram::with('concentrations')->get();
+        $activeYear = \App\Models\AcademicYear::where('is_active', true)->first();
+        $classrooms = Classroom::where('academic_year_id', $activeYear?->id)
+            ->with('majorProgram')->orderBy('nama_kelas')->get();
+        return view('admin.students.create', compact('jenjang', 'programs', 'classrooms'));
     }
 
     public function store(Request $request)
@@ -55,11 +67,29 @@ class StudentController extends Controller
             'tanggal_lahir' => 'required|date',
             'program_keahlian' => 'nullable|string|max:255',
             'konsentrasi_keahlian' => 'nullable|string|max:255',
+            'major_program_id' => 'nullable|exists:major_programs,id',
+            'major_concentration_id' => 'nullable|exists:major_concentrations,id',
+            'classroom_id' => 'nullable|exists:classrooms,id',
             'status_lulus' => 'required|boolean',
         ]);
 
         $validated['academic_year_id'] = $activeYear->id;
         $validated['is_released'] = 0;
+
+        // Auto-sync string columns from relational data for backward compatibility
+        if (!empty($validated['major_program_id'])) {
+            $prog = \App\Models\MajorProgram::find($validated['major_program_id']);
+            $validated['program_keahlian'] = $prog?->nama_program ?? $validated['program_keahlian'];
+        }
+        if (!empty($validated['major_concentration_id'])) {
+            $conc = \App\Models\MajorConcentration::find($validated['major_concentration_id']);
+            $validated['konsentrasi_keahlian'] = $conc?->nama_konsentrasi ?? $validated['konsentrasi_keahlian'];
+        }
+        // Auto-fill kelas string from classroom_id if kelas is empty
+        if (!empty($validated['classroom_id']) && empty($validated['kelas'])) {
+            $room = Classroom::find($validated['classroom_id']);
+            $validated['kelas'] = $room?->nama_kelas;
+        }
 
         Student::create($validated);
 
@@ -80,7 +110,24 @@ class StudentController extends Controller
      */
     public function edit(Student $student)
     {
-        return view('admin.students.edit', compact('student'));
+        $school = SchoolProfile::first();
+        $jenjang = $school->jenjang ?? null;
+        $programs = MajorProgram::with('concentrations')->get();
+
+        $subjects = Subject::where(function($query) use ($student) {
+            $query->whereNull('program_keahlian');
+            // Match by program name (legacy) or if null (for all)
+            if ($student->program_keahlian) {
+                $query->orWhere('program_keahlian', $student->program_keahlian);
+            }
+        })->get();
+
+        $grades = Grade::where('student_id', $student->id)->pluck('nilai', 'subject_id');
+
+        $classrooms = Classroom::where('academic_year_id', $student->academic_year_id)
+            ->orderBy('nama_kelas')->get();
+
+        return view('admin.students.edit', compact('student', 'subjects', 'grades', 'jenjang', 'programs', 'classrooms'));
     }
 
     /**
@@ -101,12 +148,42 @@ class StudentController extends Controller
             'tanggal_lahir' => 'required|date',
             'program_keahlian' => 'nullable|string|max:255',
             'konsentrasi_keahlian' => 'nullable|string|max:255',
+            'major_program_id' => 'nullable|exists:major_programs,id',
+            'major_concentration_id' => 'nullable|exists:major_concentrations,id',
+            'classroom_id' => 'nullable|exists:classrooms,id',
             'status_lulus' => 'required|boolean',
         ]);
 
+        // Auto-sync string columns from relational data for backward compatibility
+        if (!empty($validated['major_program_id'])) {
+            $prog = \App\Models\MajorProgram::find($validated['major_program_id']);
+            $validated['program_keahlian'] = $prog?->nama_program ?? $validated['program_keahlian'];
+        }
+        if (!empty($validated['major_concentration_id'])) {
+            $conc = \App\Models\MajorConcentration::find($validated['major_concentration_id']);
+            $validated['konsentrasi_keahlian'] = $conc?->nama_konsentrasi ?? $validated['konsentrasi_keahlian'];
+        }
+        // Auto-fill kelas string from classroom_id if kelas is empty
+        if (!empty($validated['classroom_id']) && empty($validated['kelas'])) {
+            $room = Classroom::find($validated['classroom_id']);
+            $validated['kelas'] = $room?->nama_kelas;
+        }
+
         $student->update($validated);
 
-        return redirect()->route('students.index')->with('success', 'Data siswa berhasil diperbarui!');
+        // Update Grades
+        if ($request->has('grades')) {
+            foreach ($request->grades as $subject_id => $nilai) {
+                if ($nilai !== null) {
+                    Grade::updateOrCreate(
+                        ['student_id' => $student->id, 'subject_id' => $subject_id],
+                        ['nilai' => $nilai]
+                    );
+                }
+            }
+        }
+
+        return redirect()->route('students.index')->with('success', 'Data siswa dan nilai berhasil diperbarui!');
     }
 
     /**

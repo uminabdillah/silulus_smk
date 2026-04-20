@@ -18,6 +18,15 @@
                     <x-nav-link :href="route('students.index')" :active="request()->routeIs('students.*')">
                         {{ __('Data Siswa') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('classrooms.index')" :active="request()->routeIs('classrooms.*')">
+                        {{ __('Kelas') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('subjects.index')" :active="request()->routeIs('subjects.*')">
+                        {{ __('Data Mapel') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('majors.index')" :active="request()->routeIs('majors.*')">
+                        {{ __('Jurusan') }}
+                    </x-nav-link>
                     <x-nav-link :href="route('school_profile.index')" :active="request()->routeIs('school_profile.*')">
                         {{ __('Identitas Sekolah') }}
                     </x-nav-link>
@@ -84,6 +93,15 @@
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('students.index')" :active="request()->routeIs('students.*')">
                 {{ __('Data Siswa') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('classrooms.index')" :active="request()->routeIs('classrooms.*')">
+                {{ __('Kelas') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('subjects.index')" :active="request()->routeIs('subjects.*')">
+                {{ __('Data Mapel') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('majors.index')" :active="request()->routeIs('majors.*')">
+                {{ __('Jurusan') }}
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('school_profile.index')" :active="request()->routeIs('school_profile.*')">
                 {{ __('Identitas Sekolah') }}

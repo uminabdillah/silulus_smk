@@ -18,5 +18,6 @@ class SchoolProfile extends Model
         'kabupaten',
         'provinsi',
         'jabatan_penandatangan',
+        'jenjang',
     ];
 }

@@ -36,9 +36,15 @@
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <x-input-label for="npsn" :value="__('NPSN')" />
-                                    <x-text-input id="npsn" name="npsn" value="{{ old('npsn', $profile->npsn) }}" type="text" class="mt-1 block w-full" required />
-                                    <x-input-error class="mt-2" :messages="$errors->get('npsn')" />
+                                    <x-input-label for="jenjang" :value="__('Jenjang Sekolah')" />
+                                    <select id="jenjang" name="jenjang" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full">
+                                        <option value="">-- Pilih Jenjang --</option>
+                                        @foreach(['SD','MI','SMP','MTs','SMA','MA','SMK','MAK'] as $j)
+                                            <option value="{{ $j }}" {{ old('jenjang', $profile->jenjang) == $j ? 'selected' : '' }}>{{ $j }}</option>
+                                        @endforeach
+                                    </select>
+                                    <p class="text-xs text-gray-400 mt-1">Menentukan tampilan kolom jurusan di form siswa.</p>
+                                    <x-input-error class="mt-2" :messages="$errors->get('jenjang')" />
                                 </div>
 
                                 <div>

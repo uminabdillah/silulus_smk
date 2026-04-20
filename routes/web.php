@@ -51,6 +51,30 @@ Route::middleware('auth')->group(function () {
     Route::post('students/bulk-delete', [StudentController::class, 'bulkDelete'])->name('students.bulk_delete');
     Route::patch('students/{student}/toggle-release', [StudentController::class, 'toggleRelease'])->name('students.toggle_release');
     Route::resource('students', StudentController::class);
+    Route::resource('subjects', \App\Http\Controllers\Admin\SubjectController::class);
+
+    // Classroom Management + Bulk Grade Entry
+    Route::prefix('classrooms')->name('classrooms.')->group(function () {
+        Route::get('/',  [\App\Http\Controllers\Admin\ClassroomController::class, 'index'])->name('index');
+        Route::post('/', [\App\Http\Controllers\Admin\ClassroomController::class, 'store'])->name('store');
+        Route::put('/{classroom}',    [\App\Http\Controllers\Admin\ClassroomController::class, 'update'])->name('update');
+        Route::delete('/{classroom}', [\App\Http\Controllers\Admin\ClassroomController::class, 'destroy'])->name('destroy');
+        Route::get('/{classroom}/grades',  [\App\Http\Controllers\Admin\ClassroomController::class, 'gradesIndex'])->name('grades.index');
+        Route::post('/{classroom}/grades', [\App\Http\Controllers\Admin\ClassroomController::class, 'gradesSave'])->name('grades.save');
+        Route::get('/{classroom}/grades/export', [\App\Http\Controllers\Admin\ClassroomController::class, 'gradesExport'])->name('grades.export');
+        Route::post('/{classroom}/grades/import', [\App\Http\Controllers\Admin\ClassroomController::class, 'gradesImport'])->name('grades.import');
+    });
+
+    // Major Management
+    Route::prefix('majors')->name('majors.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\MajorController::class, 'index'])->name('index');
+        Route::post('/programs', [\App\Http\Controllers\Admin\MajorController::class, 'storeProgram'])->name('programs.store');
+        Route::put('/programs/{program}', [\App\Http\Controllers\Admin\MajorController::class, 'updateProgram'])->name('programs.update');
+        Route::delete('/programs/{program}', [\App\Http\Controllers\Admin\MajorController::class, 'destroyProgram'])->name('programs.destroy');
+        Route::post('/concentrations', [\App\Http\Controllers\Admin\MajorController::class, 'storeConcentration'])->name('concentrations.store');
+        Route::delete('/concentrations/{concentration}', [\App\Http\Controllers\Admin\MajorController::class, 'destroyConcentration'])->name('concentrations.destroy');
+        Route::get('/programs/{program}/concentrations', [\App\Http\Controllers\Admin\MajorController::class, 'concentrationsByProgram'])->name('programs.concentrations');
+    });
 });
 
 require __DIR__.'/auth.php';

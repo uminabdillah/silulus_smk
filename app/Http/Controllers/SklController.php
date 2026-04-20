@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\Student;
 use App\Models\AcademicYear;
 use App\Models\SchoolProfile;
+use App\Models\Subject;
+use App\Models\Grade;
 use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade\Pdf;
 
@@ -69,6 +71,11 @@ class SklController extends Controller
         $template = \App\Models\SklTemplate::first();
         $rawHtml = $template ? $template->content : '<p>Admin belum mengkonfigurasi Template SKL.</p>';
         
+        // Resolve jurusan from relational data (SMK) or fallback to string (SMA/legacy)
+        $student->load('majorProgram', 'majorConcentration');
+        $programKeahlian = $student->majorProgram?->nama_program ?? $student->program_keahlian ?? '-';
+        $konsentrasiKeahlian = $student->majorConcentration?->nama_konsentrasi ?? $student->konsentrasi_keahlian ?? '-';
+
         // Define replacement map
         $replacements = [
             '{nama_sekolah}' => $school->nama_sekolah ?? '-',
@@ -77,8 +84,8 @@ class SklController extends Controller
             '{tempat_lahir}' => $student->tempat_lahir ?? '-',
             '{tgl_lahir}' => $formatDateIndo($student->tanggal_lahir),
             '{nisn}' => $student->nisn ?? '-',
-            '{program_keahlian}' => $student->program_keahlian ?? '-',
-            '{konsentrasi_keahlian}' => $student->program_keahlian ?? '-',
+            '{program_keahlian}' => $programKeahlian,
+            '{konsentrasi_keahlian}' => $konsentrasiKeahlian,
             '{tanggal_pleno}' => $formatDateIndo($academicYear->tanggal_pleno),
             '{lulus_tidak}' => 'L U L U S',
             '{tanggal_kelulusan}' => $formatDateIndo($academicYear->tanggal_kelulusan),
@@ -88,14 +95,86 @@ class SklController extends Controller
             '{provinsi_sekolah}' => $school->provinsi ?? '-',
             '{jabatan_kepala}' => $school->jabatan_penandatangan ?? 'Kepala Sekolah',
             '{kelas}' => $student->kelas ?? '-',
+            '{tabel_nilai}' => $this->generateGradeTable($student),
         ];
 
         $body_content = str_replace(array_keys($replacements), array_values($replacements), $rawHtml);
 
-        // Generate PDF using Laravel Wrapper
+        // Generate PDF using Laravel Wrapper (Size: F4)
         $pdf = Pdf::loadView('pdf.skl', compact('student', 'school', 'academicYear', 'nomor_skl', 'qrCodePath', 'body_content'));
-        $pdf->setPaper('A4', 'portrait');
+        $pdf->setPaper(array(0, 0, 609.4488, 935.433), 'portrait');
 
         return $pdf->download('SKL_' . $student->nisn . '_' . $student->nama_lengkap . '.pdf');
+    }
+
+    private function generateGradeTable(Student $student)
+    {
+        $subjects = Subject::where(function($query) use ($student) {
+            $query->whereNull('program_keahlian')->whereNull('konsentrasi_keahlian');
+            if ($student->program_keahlian) {
+                $query->orWhere(function($subq) use ($student) {
+                    $subq->where('program_keahlian', $student->program_keahlian)
+                         ->whereNull('konsentrasi_keahlian');
+                });
+            }
+            if ($student->konsentrasi_keahlian) {
+                $query->orWhere('konsentrasi_keahlian', $student->konsentrasi_keahlian);
+            }
+        })->orderBy('kelompok')->orderBy('id')->get();
+
+        $grades = Grade::where('student_id', $student->id)->pluck('nilai', 'subject_id');
+
+        $html = '<table class="table-nilai">
+                    <thead>
+                        <tr>
+                            <th width="5%">No.</th>
+                            <th width="75%">Mata Pelajaran</th>
+                            <th width="20%">Nilai</th>
+                        </tr>
+                    </thead>
+                    <tbody>';
+
+        $kelompokNames = [
+            'A' => 'A. Kelompok Mata Pelajaran Umum',
+            'B' => 'B. Kelompok Mata Pelajaran Kejuruan'
+        ];
+
+        $currentKelompok = null;
+        $no = 1;
+        $totalNilai = 0;
+        $countMapel = 0;
+
+        foreach ($subjects as $subject) {
+            if ($currentKelompok !== $subject->kelompok) {
+                $currentKelompok = $subject->kelompok;
+                $html .= '<tr class="row-kelompok">
+                            <td colspan="3"><b>' . ($kelompokNames[$currentKelompok] ?? $currentKelompok) . '</b></td>
+                          </tr>';
+                $no = 1;
+            }
+
+            $nilai = $grades[$subject->id] ?? '-';
+            if (is_numeric($nilai)) {
+                $totalNilai += $nilai;
+                $countMapel++;
+            }
+
+            $html .= '<tr>
+                        <td align="center">' . $no++ . '.</td>
+                        <td>' . $subject->nama_mapel . '</td>
+                        <td align="center">' . $nilai . '</td>
+                      </tr>';
+        }
+
+        $rataRata = $countMapel > 0 ? number_format($totalNilai / $countMapel, 2) : '-';
+
+        $html .= '<tr class="row-rata-rata">
+                    <td colspan="2" align="center"><b>Rata-rata</b></td>
+                    <td align="center"><b>' . $rataRata . '</b></td>
+                  </tr>';
+
+        $html .= '</tbody></table>';
+
+        return $html;
     }
 }

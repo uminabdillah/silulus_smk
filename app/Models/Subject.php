@@ -8,7 +8,9 @@ class Subject extends Model
 {
     protected $fillable = [
         'nama_mapel',
-        'kelompok'
+        'kelompok',
+        'program_keahlian',
+        'konsentrasi_keahlian'
     ];
 
     public function grades()

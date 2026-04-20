@@ -37,16 +37,20 @@
                         <div class="text-xs space-y-2 font-mono text-indigo-700 bg-white p-3 border rounded shadow-inner">
                             <div>{nama_lengkap}</div>
                             <div>{nisn}</div>
+                            <div>{kelas}</div>
                             <div>{tempat_lahir}</div>
                             <div>{tgl_lahir}</div>
                             <div>{program_keahlian}</div>
                             <div>{konsentrasi_keahlian}</div>
                             <div class="border-t pt-2 mt-2">{nama_sekolah}</div>
+                            <div>{kabupaten_sekolah}, {provinsi_sekolah}</div>
                             <div>{nomor_skl}</div>
                             <div>{tanggal_pleno}</div>
                             <div>{tanggal_kelulusan}</div>
                             <div>{tahun_ajaran}</div>
                             <div>{lulus_tidak}</div>
+                            <div>{jabatan_kepala}</div>
+                            <div class="border-t pt-2 mt-2 font-bold text-red-600">{tabel_nilai}</div>
                         </div>
 
                         <div class="mt-4 text-xs text-red-600 font-bold bg-red-50 p-2 rounded">

@@ -4,10 +4,13 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title>Surat Keterangan Lulus - {{ $student->nama_lengkap }}</title>
     <style>
+        @page {
+            margin: 0.8cm 1.5cm;
+        }
         body {
             font-family: "Times New Roman", Times, serif;
-            font-size: 12pt;
-            line-height: 1.5;
+            font-size: 11pt;
+            line-height: 1.3;
             margin: 0;
             padding: 0;
         }
@@ -17,51 +20,49 @@
         }
         .kop-image {
             width: 100%;
-            max-height: 140px;
+            max-height: 115px;
             object-fit: contain;
         }
         .header-bottom-line {
-            border-bottom: 3px solid black;
-            border-top: 1px solid black;
-            height: 2px;
+            border-bottom: 2px solid black;
+            border-top: 0.5px solid black;
+            height: 1.5px;
             width: 100%;
-            margin-top: 5px;
-            margin-bottom: 20px;
+            margin: 2px 0 10px 0;
         }
         .title {
             text-align: center;
             font-weight: bold;
-            margin-bottom: 20px;
-            line-height: 1.2;
+            line-height: 1.1;
+            margin-bottom: 10px;
         }
         .title span {
             display: block;
         }
         .content {
             text-align: justify;
-            margin-top: 10px;
         }
         .content table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
+            margin-bottom: 8px;
         }
         .content table td {
             vertical-align: top;
-            padding: 3px 0;
+            padding: 1px 0;
             border: none;
         }
         .lulus-status {
             text-align: center;
             font-weight: bold;
-            font-size: 16pt;
-            margin: 25px 0;
+            font-size: 14pt;
+            margin: 12px 0;
             text-transform: uppercase;
         }
 
         .signature-section {
             width: 100%;
-            margin-top: 30px;
+            margin-top: 10px;
         }
         .signature-table {
             width: 100%;
@@ -72,16 +73,52 @@
         }
         .sign-box {
             border: none;
-            padding: 15px;
+            padding: 5px 15px;
             text-align: left;
         }
-        .sign-box.no-border {
-            border: none;
-        }
         .qr-code {
-            width: 80px;
-            height: 80px;
-            margin: 10px 0;
+            width: 65px;
+            height: 65px;
+            margin: 3px 0;
+        }
+
+        /* Grade Table Styles */
+        table.table-nilai {
+            width: 100%;
+            border-collapse: collapse !important;
+            margin: 5px 0;
+            font-size: 10pt;
+        }
+        .content table.table-nilai th, .content table.table-nilai td {
+            border: 1px solid black !important;
+            padding: 3px 6px;
+            vertical-align: middle;
+        }
+        .content table.table-nilai th {
+            background-color: #f2f2f2;
+            text-transform: uppercase;
+            font-weight: bold;
+            text-align: center;
+        }
+        .content table.table-nilai tr.row-kelompok td {
+            background-color: #f9f9f9;
+            padding: 2px 6px;
+        }
+        .content table.table-nilai tr.row-rata-rata td {
+            background-color: #f2f2f2;
+        }
+
+        /* Photo Box - Fixed Centering */
+        .foto-box {
+            width: 3cm;
+            height: 4cm;
+            border: 1.5px solid black;
+            display: table-cell;
+            text-align: center;
+            vertical-align: middle;
+            font-size: 10pt;
+            color: #444;
+            background-color: #fff;
         }
     </style>
 </head>
@@ -109,23 +146,47 @@
         {!! $body_content !!}
     </div>
 
-    <div class="signature-section">
-        <table class="signature-table">
+    <!-- Section: Digital Signature & Photo Block -->
+    <div style="width: 100%; margin-top: 20px;">
+        <table style="width: 100%; border-collapse: collapse;">
             <tr>
-                <td class="sign-box" style="width: 50%; opacity: 0; border: 1px dashed white;">
-                    <!-- Spacer -->
-                </td>
-                <td class="sign-box" style="width: 50%;">
-                    <div>{{ $academicYear->tempat ?? 'Tempat' }}, {{ str_replace(array_keys(['January'=>'Januari','February'=>'Februari','March'=>'Maret','April'=>'April','May'=>'Mei','June'=>'Juni','July'=>'Juli','August'=>'Agustus','September'=>'September','October'=>'Oktober','November'=>'November','December'=>'Desember']), array_values(['January'=>'Januari','February'=>'Februari','March'=>'Maret','April'=>'April','May'=>'Mei','June'=>'Juni','July'=>'Juli','August'=>'Agustus','September'=>'September','October'=>'Oktober','November'=>'November','December'=>'Desember']), date('d F Y', strtotime($academicYear->tanggal_kelulusan))) }}</div>
-                    <div style="margin-top: 5px;">{{ $school->jabatan_penandatangan ?? 'Kepala Sekolah' }}</div>
-                    <div style="margin: 10px 0;">
-                        <!-- QR Code image injected via base64 or absolute path -->
-                        @if(file_exists($qrCodePath))
-                            <img src="{{ $qrCodePath }}" class="qr-code" alt="QR Code">
-                        @endif
-                    </div>
-                    <div style="font-weight: bold; text-decoration: underline;">{{ $school->kepala_sekolah ?? 'Nama Kepala Sekolah' }}</div>
-                    <div>NIP. {{ $school->nip_kepala ?? '-' }}</div>
+                <!-- Spacer to push the block to the right -->
+                <td style="width: 45%;"></td>
+                
+                <!-- Main Block Container -->
+                <td style="width: 55%; vertical-align: top;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <tr>
+                            <!-- Photo Box (Left side of the block) -->
+                            <td style="width: 3.2cm; vertical-align: top; padding-right: 15px;">
+                                <table style="width: 3cm; height: 4cm; border: 1px solid black; background-color: #fff; border-collapse: collapse;">
+                                    <tr>
+                                        <td style="height: 4cm; vertical-align: middle; text-align: center; font-size: 9pt; color: #555; font-family: 'Times New Roman';">
+                                            PAS FOTO<br>3 &times; 4
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+
+                            <!-- Signature Info (Right side of the block) -->
+                            <td style="vertical-align: top; text-align: center; font-family: 'Times New Roman';">
+                                <div style="margin-bottom: 2px;">{{ $school->kabupaten ?? 'Brebes' }}, {{ \Carbon\Carbon::parse($academicYear->tanggal_kelulusan)->translatedFormat('j F Y') }}</div>
+                                <div style="margin-bottom: 5px;">{{ $school->jabatan_penandatangan ?? 'Kepala Sekolah' }},</div>
+
+                                <!-- QR CODE as Digital Signature (In the middle) -->
+                                @if(file_exists($qrCodePath))
+                                <div style="margin: 8px auto;">
+                                    <img src="{{ $qrCodePath }}" style="width: 75px; height: 75px;" alt="Digital Signature">
+                                </div>
+                                @else
+                                <div style="height: 80px;"></div> {{-- Placeholder for physical sign --}}
+                                @endif
+
+                                <div style="font-weight: bold; text-decoration: underline; margin-bottom: 0;">{{ $school->kepala_sekolah ?? 'Nama Kepala Sekolah' }}</div>
+                                <div style="margin-top: 0;">NIP. {{ $school->nip_kepala ?? '-' }}</div>
+                            </td>
+                        </tr>
+                    </table>
                 </td>
             </tr>
         </table>
