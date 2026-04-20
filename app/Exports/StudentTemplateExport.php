@@ -21,6 +21,7 @@ class StudentTemplateExport implements FromArray, WithHeadings, ShouldAutoSize, 
             'nisn',
             'nis_lokal',
             'nama_lengkap',
+            'kelas',
             'tempat_lahir',
             'tanggal_lahir',
             'program_keahlian',
@@ -37,10 +38,11 @@ class StudentTemplateExport implements FromArray, WithHeadings, ShouldAutoSize, 
                 '0012345678',
                 '1001',
                 'Ahmad Fulan',
+                'XII TKJ 1',
                 'Jakarta',
                 '2005-08-17',
-                'IPA',
-                'Kimia Industri',
+                'Teknik Komputer',
+                'TKJ',
                 'Lulus',
                 '0'
             ],
@@ -48,10 +50,11 @@ class StudentTemplateExport implements FromArray, WithHeadings, ShouldAutoSize, 
                 '0012345679',
                 '1002',
                 'Siti Sarah',
+                'XII RPL 2',
                 'Bandung',
                 '2006-01-20',
-                'IPS',
-                'Akuntansi',
+                'Rekayasa Perangkat Lunak',
+                'RPL',
                 'Belum Lulus',
                 '0'
             ]
@@ -81,8 +84,8 @@ class StudentTemplateExport implements FromArray, WithHeadings, ShouldAutoSize, 
             AfterSheet::class => function(AfterSheet $event) {
                 $sheet = $event->sheet->getDelegate();
                 
-                // Add borders to the first 3 rows
-                $cellRange = 'A1:I3'; 
+                // Add borders to the header and sample data
+                $cellRange = 'A1:J3'; 
                 $sheet->getStyle($cellRange)->applyFromArray([
                     'borders' => [
                         'allBorders' => [
@@ -96,12 +99,13 @@ class StudentTemplateExport implements FromArray, WithHeadings, ShouldAutoSize, 
                 $sheet->getComment('A1')->getText()->createTextRun('Wajib diisi, hanya angka (misal: 0012345678) dan Unik.');
                 $sheet->getComment('B1')->getText()->createTextRun('Opsional (misal: 1001)');
                 $sheet->getComment('C1')->getText()->createTextRun('Wajib diisi, berisi nama peserta didik.');
-                $sheet->getComment('D1')->getText()->createTextRun('Wajib diisi, tempat lahir (misal: Jakarta).');
-                $sheet->getComment('E1')->getText()->createTextRun('Wajib diisi, format tanggal YYYY-MM-DD (Misal: 2005-08-17).');
-                $sheet->getComment('F1')->getText()->createTextRun('Opsional, Program Keahlian (misal: Teknik Mesin).');
-                $sheet->getComment('G1')->getText()->createTextRun('Opsional, Konsentrasi Keahlian (misal: Teknik Kendaraan Ringan).');
-                $sheet->getComment('H1')->getText()->createTextRun('Wajib diisi, tulis "Lulus", "1", atau "0", "Belum Lulus".');
-                $sheet->getComment('I1')->getText()->createTextRun('Status rilis akses SKL. Isi "1" untuk rilis atau "0" untuk ditahan (default: 0).');
+                $sheet->getComment('D1')->getText()->createTextRun('Wajib diisi, kelas akhir (misal: XII TKJ 1).');
+                $sheet->getComment('E1')->getText()->createTextRun('Wajib diisi, tempat lahir (misal: Jakarta).');
+                $sheet->getComment('F1')->getText()->createTextRun('Wajib diisi, format tanggal YYYY-MM-DD (Misal: 2005-08-17).');
+                $sheet->getComment('G1')->getText()->createTextRun('Opsional, Program Keahlian (misal: Teknik Mesin).');
+                $sheet->getComment('H1')->getText()->createTextRun('Opsional, Konsentrasi Keahlian (misal: Teknik Kendaraan Ringan).');
+                $sheet->getComment('I1')->getText()->createTextRun('Wajib diisi, tulis "Lulus", "1", atau "0", "Belum Lulus".');
+                $sheet->getComment('J1')->getText()->createTextRun('Status rilis akses SKL. Isi "1" untuk rilis atau "0" untuk ditahan (default: 0).');
                 
                 // Adjust row dimension for header
                 $sheet->getRowDimension(1)->setRowHeight(25);

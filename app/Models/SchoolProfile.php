@@ -15,5 +15,8 @@ class SchoolProfile extends Model
         'logo_path',
         'tanda_tangan_path',
         'kop_surat',
+        'kabupaten',
+        'provinsi',
+        'jabatan_penandatangan',
     ];
 }

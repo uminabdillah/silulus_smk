@@ -10,6 +10,7 @@ class Student extends Model
         'nisn',
         'nis_lokal',
         'nama_lengkap',
+        'kelas',
         'tempat_lahir',
         'tanggal_lahir',
         'nama_ortu',

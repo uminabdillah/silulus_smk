@@ -84,6 +84,10 @@ class SklController extends Controller
             '{tanggal_kelulusan}' => $formatDateIndo($academicYear->tanggal_kelulusan),
             '{tahun_ajaran}' => $academicYear->tahun_ajaran ?? '-',
             '{nomor_skl}' => $nomor_skl ?? '-',
+            '{kabupaten_sekolah}' => $school->kabupaten ?? '-',
+            '{provinsi_sekolah}' => $school->provinsi ?? '-',
+            '{jabatan_kepala}' => $school->jabatan_penandatangan ?? 'Kepala Sekolah',
+            '{kelas}' => $student->kelas ?? '-',
         ];
 
         $body_content = str_replace(array_keys($replacements), array_values($replacements), $rawHtml);

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Cek Kelulusan - {{ $school->nama_sekolah ?? 'Sekolah' }}</title>
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
+    <link rel="icon" type="image/png" href="{{ $school->logo_path ? asset('storage/' . $school->logo_path) : asset('images/logo.png') }}">
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700,800&display=swap" rel="stylesheet" />
@@ -33,9 +33,14 @@
         
         <!-- Header / Logo -->
         <div class="flex justify-between items-center mb-6 px-4">
-            <div class="text-white">
-                <h1 class="text-2xl font-extrabold tracking-tight">{{ $school->nama_sekolah ?? 'PORTAL KELULUSAN' }}</h1>
-                <p class="text-sm opacity-80">{{ $school->npsn ?? '' }} | {{ $school->alamat ?? '' }}</p>
+            <div class="flex items-center gap-4">
+                @if($school->logo_path)
+                    <img src="{{ asset('storage/' . $school->logo_path) }}" class="h-12 w-auto object-contain" alt="Logo">
+                @endif
+                <div class="text-white">
+                    <h1 class="text-2xl font-extrabold tracking-tight uppercase">{{ $school->nama_sekolah ?? 'PORTAL KELULUSAN' }}</h1>
+                    <p class="text-xs opacity-70 font-medium tracking-wider">{{ $school->npsn ?? '' }} | {{ $school->alamat ?? '' }}</p>
+                </div>
             </div>
             @if(Route::has('login'))
                 <div class="text-right">
@@ -171,59 +176,70 @@
                 <!-- Result Header -->
                 <div class="{{ $headerColor }} p-5 md:p-8 flex justify-between items-center border-b border-white/10">
                     <h2 class="text-xl md:text-3xl font-black text-white tracking-wide uppercase">{{ $statusText }}</h2>
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/9/9c/Logo_of_Ministry_of_Education_and_Culture_of_Republic_of_Indonesia.svg" class="h-12 md:h-16 brightness-0 invert opacity-90" alt="Logo Tut Wuri">
+                    @if($school->logo_path)
+                    <img src="{{ asset('storage/' . $school->logo_path) }}" class="h-12 w-auto object-contain" alt="Logo">
+                @endif
                 </div>
 
                 <div class="p-6 md:p-10 relative">
                     <div class="flex flex-col md:flex-row gap-8 items-start">
                         
-                        <!-- Main Info -->
-                        <div class="flex-grow space-y-4">
-                            <div>
-                                <p class="text-blue-400 text-xs font-bold uppercase tracking-widest">NISN {{ $student->nisn }}</p>
-                                <h3 class="text-3xl md:text-5xl font-black text-white mt-1">{{ $student->nama_lengkap }}</h3>
-                                <p class="text-gray-400 text-lg mt-1">Kelas {{ $student->program_keahlian }}</p>
-                                <p class="text-gray-500 text-sm">{{ $school->nama_sekolah }}</p>
+                        <!-- Student Details -->
+                        <div class="flex-grow space-y-8">
+                            <div class="border-b border-white/5 pb-8">
+                                <p class="text-blue-400 text-[10px] font-black uppercase tracking-[0.3em] mb-3 leading-none">Status Kelulusan Siswa</p>
+                                <h3 class="text-4xl md:text-6xl font-black text-white leading-none tracking-tighter uppercase mb-4">{{ $student->nama_lengkap }}</h3>
+                                <div class="flex flex-wrap items-center gap-3">
+                                    <span class="px-3 py-1 bg-blue-500 text-white rounded text-[10px] font-black uppercase tracking-widest leading-none">
+                                        Kelas {{ $student->kelas ?? '-' }}
+                                    </span>
+                                    <span class="px-3 py-1 bg-slate-800 border border-slate-700 text-gray-400 rounded text-[10px] font-black uppercase tracking-widest leading-none">
+                                        NISN • {{ $student->nisn }}
+                                    </span>
+                                </div>
                             </div>
 
-                            <div class="grid grid-cols-2 gap-y-6 pt-6 border-t border-white/10">
-                                <div>
-                                    <p class="text-gray-500 text-xs font-bold uppercase tracking-tighter">Tanggal Lahir</p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+                                <div class="group">
+                                    <p class="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-2 group-hover:text-blue-400 transition-colors">Tanggal Lahir</p>
                                     @php
                                         $dateTranslated = \Carbon\Carbon::parse($student->tanggal_lahir)->translatedFormat('d F Y');
                                     @endphp
-                                    <p class="text-white font-bold">{{ $dateTranslated }}</p>
+                                    <p class="text-white font-bold text-xl leading-tight uppercase tracking-tight">{{ $dateTranslated }}</p>
                                 </div>
-                                <div>
-                                    <p class="text-gray-500 text-xs font-bold uppercase tracking-tighter">Kabupaten/Kota</p>
-                                    <p class="text-white font-bold">Brebes</p>
+                                <div class="group">
+                                    <p class="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-2 group-hover:text-blue-400 transition-colors">Satuan Pendidikan</p>
+                                    <p class="text-white font-bold text-xl leading-tight uppercase tracking-tight">{{ $school->nama_sekolah ?? '-' }}</p>
                                 </div>
-                                <div>
-                                    <p class="text-gray-500 text-xs font-bold uppercase tracking-tighter">Kelas / Jurusan</p>
-                                    <p class="text-white font-bold">{{ $student->program_keahlian }}</p>
+                                <div class="group">
+                                    <p class="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-2 group-hover:text-blue-400 transition-colors">Kabupaten/Kota</p>
+                                    <p class="text-white font-bold text-xl leading-tight uppercase tracking-tight">{{ $school->kabupaten ?? '-' }}</p>
                                 </div>
-                                <div>
-                                    <p class="text-gray-500 text-xs font-bold uppercase tracking-tighter">Provinsi</p>
-                                    <p class="text-white font-bold">Jawa Tengah</p>
+                                <div class="group">
+                                    <p class="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-2 group-hover:text-blue-400 transition-colors">Provinsi</p>
+                                    <p class="text-white font-bold text-xl leading-tight uppercase tracking-tight">{{ $school->provinsi ?? '-' }}</p>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Side Element (QR & Floating Card) -->
-                        <div class="w-full md:w-auto flex flex-col items-center md:items-end gap-6">
-                            <!-- QR Code -->
-                            <div class="bg-white p-2 rounded-xl shadow-lg">
-                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ urlencode(route('verify.skl', $student->nisn)) }}" 
-                                     alt="QR Verification" class="w-32 h-32">
+                        <!-- Side Actions / Verifikasi -->
+                        <div class="w-full md:w-72 flex flex-col justify-between gap-8 border-t md:border-t-0 md:border-l border-white/10 pt-8 md:pt-0 md:pl-10">
+                            <div class="space-y-6">
+                                <p class="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-4 md:text-right">Verifikasi Dokumen</p>
+                                <div class="flex justify-center md:justify-end">
+                                    <div class="bg-white p-2 rounded-2xl shadow-2xl shadow-blue-500/10 hover:scale-105 transition-transform duration-300">
+                                        {!! QrCode::size(140)->backgroundColor(255,255,255)->color(15,23,42)->margin(2)->generate(route('verify.skl', $student->nisn)) !!}
+                                    </div>
+                                </div>
+                                <p class="text-slate-600 text-[9px] font-medium text-center md:text-right leading-relaxed italic">Scan untuk verifikasi keaslian dokumen secara online.</p>
                             </div>
 
                             @if($isLulus)
-                            <!-- Download Card (Bottom Right Floating feel) -->
-                            <div class="bg-white rounded-xl p-5 shadow-2xl max-w-xs text-left animate-bounce-slow">
-                                <h4 class="font-bold text-gray-900 text-sm">Silahkan Download SKL</h4>
-                                <p class="text-[10px] text-gray-500 mt-1 leading-tight">SKL dapat di-download pada link berikut atau datang ke sekolah untuk pengesahan.</p>
+                            <div class="bg-blue-600 rounded-2xl p-6 shadow-2xl shadow-blue-600/20 group hover:bg-blue-500 transition-all border border-blue-400/20">
+                                <h4 class="font-black text-white text-xs uppercase tracking-widest mb-2">Cetak SKL</h4>
+                                <p class="text-[10px] text-blue-100 leading-snug mb-4">Surat Keterangan Lulus resmi dapat diunduh sekarang.</p>
                                 <a href="{{ route('students.download_skl', $student->id) }}" 
-                                   class="mt-3 inline-block bg-blue-100 text-blue-700 font-bold px-4 py-2 rounded-lg text-xs hover:bg-blue-600 hover:text-white transition duration-200">
+                                   class="flex items-center justify-center w-full bg-white text-blue-600 font-black py-3 rounded-xl text-[10px] uppercase tracking-[0.2em] hover:bg-blue-50 transition active:scale-95 shadow-lg">
                                    Download SKL
                                 </a>
                             </div>

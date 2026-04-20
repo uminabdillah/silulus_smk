@@ -25,6 +25,12 @@
                                 @error('nis_lokal') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                             </div>
 
+                            <div>
+                                <label for="kelas" class="block text-sm font-medium text-gray-700 mb-1">Kelas (misal: XII TKJ 1) *</label>
+                                <input type="text" name="kelas" id="kelas" value="{{ old('kelas') }}" required class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                @error('kelas') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                            </div>
+
                             <div class="md:col-span-2">
                                 <label for="nama_lengkap" class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap *</label>
                                 <input type="text" name="nama_lengkap" id="nama_lengkap" value="{{ old('nama_lengkap') }}" required class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">

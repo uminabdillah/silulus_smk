@@ -35,6 +35,7 @@ class StudentsImport implements ToModel, WithHeadingRow
             'nisn'             => $row['nisn'],
             'nis_lokal'        => $row['nis_lokal'] ?? null,
             'nama_lengkap'     => $row['nama_lengkap'] ?? 'Tanpa Nama',
+            'kelas'            => $row['kelas'] ?? null,
             'tempat_lahir'     => $row['tempat_lahir'] ?? 'Tidak Diketahui',
             'tanggal_lahir'    => $tanggal_lahir,
             'program_keahlian' => $row['program_keahlian'] ?? null,

@@ -22,7 +22,11 @@
                 <div class="text-left bg-gray-50 border border-gray-200 rounded p-4 space-y-3">
                     <div>
                         <span class="block text-xs font-semibold text-gray-500 uppercase">Nama Lengkap</span>
-                        <span class="block text-sm text-gray-900">{{ $student->nama_lengkap }}</span>
+                        <span class="block text-sm text-gray-900 font-bold underline decoration-blue-200 underline-offset-4">{{ $student->nama_lengkap }}</span>
+                    </div>
+                    <div>
+                        <span class="block text-xs font-semibold text-gray-500 uppercase">Kelas</span>
+                        <span class="block text-sm text-gray-900 font-bold text-blue-600">{{ $student->kelas ?? '-' }}</span>
                     </div>
                     <div>
                         <span class="block text-xs font-semibold text-gray-500 uppercase">NISN / NIS</span>

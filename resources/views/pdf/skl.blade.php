@@ -117,7 +117,7 @@
                 </td>
                 <td class="sign-box" style="width: 50%;">
                     <div>{{ $academicYear->tempat ?? 'Tempat' }}, {{ str_replace(array_keys(['January'=>'Januari','February'=>'Februari','March'=>'Maret','April'=>'April','May'=>'Mei','June'=>'Juni','July'=>'Juli','August'=>'Agustus','September'=>'September','October'=>'Oktober','November'=>'November','December'=>'Desember']), array_values(['January'=>'Januari','February'=>'Februari','March'=>'Maret','April'=>'April','May'=>'Mei','June'=>'Juni','July'=>'Juli','August'=>'Agustus','September'=>'September','October'=>'Oktober','November'=>'November','December'=>'Desember']), date('d F Y', strtotime($academicYear->tanggal_kelulusan))) }}</div>
-                    <div style="margin-top: 5px;">Kepala Sekolah</div>
+                    <div style="margin-top: 5px;">{{ $school->jabatan_penandatangan ?? 'Kepala Sekolah' }}</div>
                     <div style="margin: 10px 0;">
                         <!-- QR Code image injected via base64 or absolute path -->
                         @if(file_exists($qrCodePath))
