@@ -37,32 +37,44 @@ class SchoolProfileController extends Controller
             'kepala_sekolah' => 'required|string|max:255',
             'nip_kepala' => 'nullable|string|max:255',
             'jabatan_penandatangan' => 'required|string|max:255',
-            'logo_path' => 'nullable|image|mimes:jpeg,png,jpg,svg|max:2048',
-            'kop_surat' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
+            'logo_path' => 'nullable|file|image|mimes:jpeg,png,jpg,svg|max:5120',
+            'kop_surat' => 'nullable|file|image|mimes:jpeg,png,jpg|max:5120',
         ]);
 
         $profile = SchoolProfile::first();
+        if (!$profile) {
+            $profile = new SchoolProfile();
+        }
         $data = $request->except(['logo_path', 'kop_surat']);
 
-        if ($request->hasFile('logo_path')) {
-            // Delete old file if exists
-            if ($profile->logo_path && \Illuminate\Support\Facades\Storage::disk('public')->exists($profile->logo_path)) {
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($profile->logo_path);
+        try {
+            if ($request->hasFile('logo_path')) {
+                // Delete old file if exists
+                if ($profile->logo_path && \Illuminate\Support\Facades\Storage::disk('public')->exists($profile->logo_path)) {
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($profile->logo_path);
+                }
+                $path = $request->file('logo_path')->store('profiles', 'public');
+                $data['logo_path'] = $path;
             }
-            $path = $request->file('logo_path')->store('profiles', 'public');
-            $data['logo_path'] = $path;
-        }
 
-        if ($request->hasFile('kop_surat')) {
-            // Delete old file if exists
-            if ($profile->kop_surat && \Illuminate\Support\Facades\Storage::disk('public')->exists($profile->kop_surat)) {
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($profile->kop_surat);
+            if ($request->hasFile('kop_surat')) {
+                // Delete old file if exists
+                if ($profile->kop_surat && \Illuminate\Support\Facades\Storage::disk('public')->exists($profile->kop_surat)) {
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($profile->kop_surat);
+                }
+                $path = $request->file('kop_surat')->store('profiles', 'public');
+                $data['kop_surat'] = $path;
             }
-            $path = $request->file('kop_surat')->store('profiles', 'public');
-            $data['kop_surat'] = $path;
-        }
 
-        $profile->update($data);
+            if ($profile->exists) {
+                $profile->update($data);
+            } else {
+                $profile->fill($data);
+                $profile->save();
+            }
+        } catch (\Exception $e) {
+            return back()->withInput()->with('error', 'Gagal mengunggah file: ' . $e->getMessage());
+        }
 
         return back()->with('success', 'Identitas Sekolah berhasil diperbarui.');
     }

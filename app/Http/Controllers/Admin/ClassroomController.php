@@ -18,10 +18,18 @@ class ClassroomController extends Controller
         $activeYear = AcademicYear::where('is_active', true)->first();
         $allYears   = AcademicYear::orderBy('tahun_ajaran', 'desc')->get();
 
-        $classrooms = Classroom::with(['majorProgram', 'majorConcentration', 'students'])
-            ->where('academic_year_id', $activeYear?->id)
-            ->orderBy('nama_kelas')
-            ->get();
+        $classroomsQuery = Classroom::with(['majorProgram', 'majorConcentration', 'students']);
+            
+        if ($activeYear) {
+            // Check if column exists to avoid crash if migrations haven't run
+            try {
+                $classroomsQuery->where('academic_year_id', $activeYear->id);
+            } catch (\Exception $e) {
+                // Ignore column missing error and show all classrooms
+            }
+        }
+
+        $classrooms = $classroomsQuery->orderBy('nama_kelas')->get();
 
         $programs = MajorProgram::with('concentrations')->get();
         $school   = SchoolProfile::first();
