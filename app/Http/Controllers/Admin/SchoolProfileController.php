@@ -74,6 +74,13 @@ class SchoolProfileController extends Controller
             $profile->fill($data);
             $profile->save();
 
+            // Force update using Query Builder as a fallback for shared hosting issues
+            if ($profile->id) {
+                \Illuminate\Support\Facades\DB::table('school_profiles')
+                    ->where('id', $profile->id)
+                    ->update($data);
+            }
+
             \Illuminate\Support\Facades\Log::info('School Profile Updated', ['id' => $profile->id, 'data' => $data]);
             
         } catch (\Exception $e) {
@@ -81,6 +88,7 @@ class SchoolProfileController extends Controller
             return back()->withInput()->with('error', 'Gagal memperbarui: ' . $e->getMessage());
         }
 
-        return back()->with('success', 'Identitas ' . $profile->nama_sekolah . ' berhasil diperbarui.');
+        $debugInfo = " (Data tersimpan: " . ($data['jenjang'] ?? 'null') . ")";
+        return back()->with('success', 'Identitas ' . $profile->nama_sekolah . ' berhasil diperbarui.' . $debugInfo);
     }
 }
