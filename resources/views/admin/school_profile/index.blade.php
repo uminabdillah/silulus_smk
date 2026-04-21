@@ -19,6 +19,17 @@
                             </p>
                         </header>
 
+                        @if ($errors->any())
+                            <div class="mt-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
+                                <strong class="font-bold">Ada kesalahan!</strong>
+                                <ul class="mt-2 list-disc list-inside text-sm">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+
                         @if (session('success'))
                             <div class="mt-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
                                 <span class="block sm:inline">{{ session('success') }}</span>
@@ -137,29 +148,6 @@
         </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.querySelector('form');
-            const logoInput = document.getElementById('logo_path');
-            const kopInput = document.getElementById('kop_surat');
-            
-            form.addEventListener('submit', function(e) {
-                let maxSize = 5 * 1024 * 1024; // 5MB
-                let errorMessage = '';
-
-                if (logoInput.files.length > 0 && logoInput.files[0].size > maxSize) {
-                    errorMessage = 'Ukuran Logo terlalu besar (Maksimal 5MB)';
-                }
-                
-                if (kopInput.files.length > 0 && kopInput.files[0].size > maxSize) {
-                    errorMessage = 'Ukuran Kop Surat terlalu besar (Maksimal 5MB)';
-                }
-
-                if (errorMessage) {
-                    e.preventDefault();
-                    alert(errorMessage);
-                }
-            });
-        });
-    </script>
+        </div>
+    </div>
 </x-app-layout>

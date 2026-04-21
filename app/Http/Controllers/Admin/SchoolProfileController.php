@@ -38,6 +38,7 @@ class SchoolProfileController extends Controller
 
     public function store(Request $request)
     {
+
         $request->validate([
             'nama_sekolah' => 'required|string|max:255',
             'npsn' => 'required|string|max:255',
@@ -48,8 +49,8 @@ class SchoolProfileController extends Controller
             'nip_kepala' => 'nullable|string|max:255',
             'jabatan_penandatangan' => 'required|string|max:255',
             'jenjang' => 'nullable|string|max:10',
-            'logo_path' => 'nullable|file|image|mimes:jpeg,png,jpg,svg|max:5120',
-            'kop_surat' => 'nullable|file|image|mimes:jpeg,png,jpg|max:5120',
+            'logo_path' => 'nullable|file|image|mimes:jpeg,png,jpg,svg|max:10240',
+            'kop_surat' => 'nullable|file|image|mimes:jpeg,png,jpg|max:10240',
         ]);
 
         $profile = SchoolProfile::find(1) ?? SchoolProfile::first();
@@ -96,8 +97,6 @@ class SchoolProfileController extends Controller
             return back()->withInput()->with('error', 'Gagal memperbarui: ' . $e->getMessage());
         }
 
-        $profile = SchoolProfile::find(1); // Fresh data
-        $debugInfo = " (ID: 1, Saved: " . ($data['jenjang'] ?? 'null') . ")";
-        return back()->with('success', 'Identitas ' . $profile->nama_sekolah . ' berhasil diperbarui.' . $debugInfo);
+        return back()->with('success', 'Identitas Sekolah berhasil diperbarui.');
     }
 }
