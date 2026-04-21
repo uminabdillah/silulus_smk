@@ -37,6 +37,7 @@ class SchoolProfileController extends Controller
             'kepala_sekolah' => 'required|string|max:255',
             'nip_kepala' => 'nullable|string|max:255',
             'jabatan_penandatangan' => 'required|string|max:255',
+            'jenjang' => 'nullable|string|max:10',
             'logo_path' => 'nullable|file|image|mimes:jpeg,png,jpg,svg|max:5120',
             'kop_surat' => 'nullable|file|image|mimes:jpeg,png,jpg|max:5120',
         ]);
@@ -45,7 +46,11 @@ class SchoolProfileController extends Controller
         if (!$profile) {
             $profile = new SchoolProfile();
         }
-        $data = $request->except(['logo_path', 'kop_surat']);
+
+        $data = $request->only([
+            'nama_sekolah', 'npsn', 'alamat', 'kabupaten', 'provinsi', 
+            'kepala_sekolah', 'nip_kepala', 'jabatan_penandatangan', 'jenjang'
+        ]);
 
         try {
             if ($request->hasFile('logo_path')) {
@@ -76,6 +81,6 @@ class SchoolProfileController extends Controller
             return back()->withInput()->with('error', 'Gagal memperbarui: ' . $e->getMessage());
         }
 
-        return back()->with('success', 'Identitas Sekolah berhasil diperbarui.');
+        return back()->with('success', 'Identitas ' . $profile->nama_sekolah . ' berhasil diperbarui.');
     }
 }
