@@ -10,18 +10,28 @@ class SchoolProfileController extends Controller
 {
     public function index()
     {
-        $profile = SchoolProfile::first();
+        $profile = SchoolProfile::find(1);
         if (!$profile) {
-            $profile = SchoolProfile::create([
-                'nama_sekolah' => 'SMK MAARIF NU 01 JATIBARANG',
-                'npsn' => '12345678',
-                'alamat' => 'Jl. Kebon Jeruk No. 1',
-                'kabupaten' => 'Brebes',
-                'provinsi' => 'Jawa Tengah',
-                'kepala_sekolah' => 'Nama Kepala Sekolah',
-                'nip_kepala' => '-',
-                'jabatan_penandatangan' => 'Kepala Sekolah'
-            ]);
+            $profile = SchoolProfile::first(); // fallback to any record
+            if (!$profile) {
+                $profile = SchoolProfile::create([
+                    'id' => 1,
+                    'nama_sekolah' => 'SMK MAARIF NU 01 JATIBARANG',
+                    'npsn' => '12345678',
+                    'alamat' => 'Jl. Kebon Jeruk No. 1',
+                    'kabupaten' => 'Brebes',
+                    'provinsi' => 'Jawa Tengah',
+                    'kepala_sekolah' => 'Nama Kepala Sekolah',
+                    'nip_kepala' => '-',
+                    'jabatan_penandatangan' => 'Kepala Sekolah'
+                ]);
+            } else {
+                // If ID is not 1, we force it to be 1 to maintain consistency
+                if ($profile->id != 1) {
+                    \Illuminate\Support\Facades\DB::table('school_profiles')->where('id', $profile->id)->update(['id' => 1]);
+                    $profile = SchoolProfile::find(1);
+                }
+            }
         }
         return view('admin.school_profile.index', compact('profile'));
     }
@@ -42,9 +52,10 @@ class SchoolProfileController extends Controller
             'kop_surat' => 'nullable|file|image|mimes:jpeg,png,jpg|max:5120',
         ]);
 
-        $profile = SchoolProfile::first();
+        $profile = SchoolProfile::find(1) ?? SchoolProfile::first();
         if (!$profile) {
             $profile = new SchoolProfile();
+            $profile->id = 1;
         }
 
         $data = $request->only([
@@ -74,21 +85,19 @@ class SchoolProfileController extends Controller
             $profile->fill($data);
             $profile->save();
 
-            // Force update using Query Builder as a fallback for shared hosting issues
-            if ($profile->id) {
-                \Illuminate\Support\Facades\DB::table('school_profiles')
-                    ->where('id', $profile->id)
-                    ->update($data);
-            }
+            // Force update using Query Builder on exact ID 1
+            \Illuminate\Support\Facades\DB::table('school_profiles')
+                ->updateOrInsert(['id' => 1], $data);
 
-            \Illuminate\Support\Facades\Log::info('School Profile Updated', ['id' => $profile->id, 'data' => $data]);
+            \Illuminate\Support\Facades\Log::info('School Profile Updated', ['id' => 1, 'data' => $data]);
             
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('School Profile Update Failed', ['error' => $e->getMessage()]);
             return back()->withInput()->with('error', 'Gagal memperbarui: ' . $e->getMessage());
         }
 
-        $debugInfo = " (Data tersimpan: " . ($data['jenjang'] ?? 'null') . ")";
+        $profile = SchoolProfile::find(1); // Fresh data
+        $debugInfo = " (ID: 1, Saved: " . ($data['jenjang'] ?? 'null') . ")";
         return back()->with('success', 'Identitas ' . $profile->nama_sekolah . ' berhasil diperbarui.' . $debugInfo);
     }
 }
