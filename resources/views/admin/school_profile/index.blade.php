@@ -136,4 +136,30 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form');
+            const logoInput = document.getElementById('logo_path');
+            const kopInput = document.getElementById('kop_surat');
+            
+            form.addEventListener('submit', function(e) {
+                let maxSize = 5 * 1024 * 1024; // 5MB
+                let errorMessage = '';
+
+                if (logoInput.files.length > 0 && logoInput.files[0].size > maxSize) {
+                    errorMessage = 'Ukuran Logo terlalu besar (Maksimal 5MB)';
+                }
+                
+                if (kopInput.files.length > 0 && kopInput.files[0].size > maxSize) {
+                    errorMessage = 'Ukuran Kop Surat terlalu besar (Maksimal 5MB)';
+                }
+
+                if (errorMessage) {
+                    e.preventDefault();
+                    alert(errorMessage);
+                }
+            });
+        });
+    </script>
 </x-app-layout>

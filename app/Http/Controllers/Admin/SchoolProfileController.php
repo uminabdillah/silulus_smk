@@ -54,7 +54,7 @@ class SchoolProfileController extends Controller
                     \Illuminate\Support\Facades\Storage::disk('public')->delete($profile->logo_path);
                 }
                 $path = $request->file('logo_path')->store('profiles', 'public');
-                $data['logo_path'] = $path;
+                $profile->logo_path = $path;
             }
 
             if ($request->hasFile('kop_surat')) {
@@ -63,17 +63,17 @@ class SchoolProfileController extends Controller
                     \Illuminate\Support\Facades\Storage::disk('public')->delete($profile->kop_surat);
                 }
                 $path = $request->file('kop_surat')->store('profiles', 'public');
-                $data['kop_surat'] = $path;
+                $profile->kop_surat = $path;
             }
 
-            if ($profile->exists) {
-                $profile->update($data);
-            } else {
-                $profile->fill($data);
-                $profile->save();
-            }
+            $profile->fill($data);
+            $profile->save();
+
+            \Illuminate\Support\Facades\Log::info('School Profile Updated', ['id' => $profile->id, 'data' => $data]);
+            
         } catch (\Exception $e) {
-            return back()->withInput()->with('error', 'Gagal mengunggah file: ' . $e->getMessage());
+            \Illuminate\Support\Facades\Log::error('School Profile Update Failed', ['error' => $e->getMessage()]);
+            return back()->withInput()->with('error', 'Gagal memperbarui: ' . $e->getMessage());
         }
 
         return back()->with('success', 'Identitas Sekolah berhasil diperbarui.');
