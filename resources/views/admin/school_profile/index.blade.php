@@ -45,10 +45,17 @@
                         <form method="post" action="{{ route('school_profile.store') }}" class="mt-6 space-y-6" enctype="multipart/form-data">
                             @csrf
 
-                            <div>
-                                <x-input-label for="nama_sekolah" :value="__('Nama Sekolah')" />
-                                <x-text-input id="nama_sekolah" name="nama_sekolah" value="{{ old('nama_sekolah', $profile->nama_sekolah) }}" type="text" class="mt-1 block w-full" required autofocus />
-                                <x-input-error class="mt-2" :messages="$errors->get('nama_sekolah')" />
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <x-input-label for="nama_sekolah" :value="__('Nama Sekolah')" />
+                                    <x-text-input id="nama_sekolah" name="nama_sekolah" value="{{ old('nama_sekolah', $profile->nama_sekolah) }}" type="text" class="mt-1 block w-full" required autofocus />
+                                    <x-input-error class="mt-2" :messages="$errors->get('nama_sekolah')" />
+                                </div>
+                                <div>
+                                    <x-input-label for="npsn" :value="__('NPSN')" />
+                                    <x-text-input id="npsn" name="npsn" value="{{ old('npsn', $profile->npsn) }}" type="text" class="mt-1 block w-full" required />
+                                    <x-input-error class="mt-2" :messages="$errors->get('npsn')" />
+                                </div>
                             </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
