@@ -116,8 +116,9 @@
                             <div>
                                 <label for="status_lulus" class="block text-sm font-medium text-gray-700 mb-1">Status Lulus *</label>
                                 <select name="status_lulus" id="status_lulus" required class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                    <option value="0" {{ old('status_lulus', $student->status_lulus) == '0' ? 'selected' : '' }}>Belum / Tidak Lulus</option>
-                                    <option value="1" {{ old('status_lulus', $student->status_lulus) == '1' ? 'selected' : '' }}>Lulus</option>
+                                    <option value="tidak lulus" {{ old('status_lulus', $student->status_lulus) == 'tidak lulus' ? 'selected' : '' }}>Tidak Lulus</option>
+                                    <option value="lulus" {{ old('status_lulus', $student->status_lulus) == 'lulus' ? 'selected' : '' }}>Lulus</option>
+                                    <option value="lulus bersyarat" {{ old('status_lulus', $student->status_lulus) == 'lulus bersyarat' ? 'selected' : '' }}>Lulus Bersyarat</option>
                                 </select>
                                 @error('status_lulus') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                             </div>

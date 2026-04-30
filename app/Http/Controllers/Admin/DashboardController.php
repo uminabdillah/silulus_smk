@@ -26,8 +26,8 @@ class DashboardController extends Controller
         }
 
         $totalSiswa = Student::where('academic_year_id', $activeYear->id)->count();
-        $lulus      = Student::where('academic_year_id', $activeYear->id)->where('status_lulus', 1)->count();
-        $tidakLulus = Student::where('academic_year_id', $activeYear->id)->where('status_lulus', 0)->count();
+        $lulus      = Student::where('academic_year_id', $activeYear->id)->whereIn('status_lulus', ['lulus', 'lulus bersyarat'])->count();
+        $tidakLulus = Student::where('academic_year_id', $activeYear->id)->where('status_lulus', 'tidak lulus')->count();
 
         // Unique students who opened their results in the active year
         $dibuka = StudentAccessLog::whereHas('student', function ($query) use ($activeYear) {

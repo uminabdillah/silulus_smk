@@ -80,8 +80,10 @@
                                     <td class="px-6 py-4 font-mono font-bold text-gray-400">{{ $log->student->nisn }}</td>
                                     <td class="px-6 py-4 font-bold text-gray-900">{{ $log->student->nama_lengkap }}</td>
                                     <td class="px-6 py-4">
-                                        @if($log->student->status_lulus)
+                                        @if($log->student->status_lulus === 'lulus')
                                             <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-emerald-100 text-emerald-800">LULUS</span>
+                                        @elseif($log->student->status_lulus === 'lulus bersyarat')
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-amber-100 text-amber-800">LULUS BERSYARAT</span>
                                         @else
                                             <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-rose-100 text-rose-800">TIDAK LULUS</span>
                                         @endif

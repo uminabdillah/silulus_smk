@@ -41,7 +41,7 @@ class DatabaseSeeder extends Seeder
             'tanggal_lahir' => '2005-08-17',
             'nama_ortu' => 'Bapak Fulan',
             'program_keahlian' => 'IPA',
-            'status_lulus' => true,
+            'status_lulus' => 'lulus',
         ]);
 
         $matematika = Subject::create(['nama_mapel' => 'Matematika', 'kelompok' => 'A']);

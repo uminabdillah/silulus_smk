@@ -83,7 +83,11 @@ class StudentsImport implements ToModel, WithHeadingRow, WithValidation, SkipsEm
             'konsentrasi_keahlian'   => $row['konsentrasi_keahlian'] ?? null,
             'major_program_id'       => $majorProgramId,
             'major_concentration_id' => $majorConcentrationId,
-            'status_lulus'           => ((string)($row['status_lulus'] ?? '0') === '1' || strtolower($row['status_lulus'] ?? '') === 'lulus') ? 1 : 0,
+            'status_lulus'           => match(strtolower((string)($row['status_lulus'] ?? 'tidak lulus'))) {
+                '1', 'lulus' => 'lulus bersyarat', 
+                'lulus bersyarat' => 'lulus bersyarat',
+                default => 'tidak lulus',
+            },
             'academic_year_id'       => $this->activeYear?->id,
             'is_released'            => ((string)($row['is_released'] ?? '0') !== '0') ? 1 : 0,
         ]);

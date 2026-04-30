@@ -70,7 +70,7 @@ class StudentController extends Controller
             'major_program_id' => 'nullable|exists:major_programs,id',
             'major_concentration_id' => 'nullable|exists:major_concentrations,id',
             'classroom_id' => 'nullable|exists:classrooms,id',
-            'status_lulus' => 'required|boolean',
+            'status_lulus' => 'required|string|in:lulus,tidak lulus,lulus bersyarat',
         ]);
 
         $validated['academic_year_id'] = $activeYear->id;
@@ -89,6 +89,11 @@ class StudentController extends Controller
         if (!empty($validated['classroom_id']) && empty($validated['kelas'])) {
             $room = Classroom::find($validated['classroom_id']);
             $validated['kelas'] = $room?->nama_kelas;
+        }
+
+        // Automatically set to 'lulus bersyarat' if marked as 'lulus' but has no grades yet (newly created)
+        if ($validated['status_lulus'] === 'lulus') {
+            $validated['status_lulus'] = 'lulus bersyarat';
         }
 
         Student::create($validated);
@@ -151,7 +156,7 @@ class StudentController extends Controller
             'major_program_id' => 'nullable|exists:major_programs,id',
             'major_concentration_id' => 'nullable|exists:major_concentrations,id',
             'classroom_id' => 'nullable|exists:classrooms,id',
-            'status_lulus' => 'required|boolean',
+            'status_lulus' => 'required|string|in:lulus,tidak lulus,lulus bersyarat',
         ]);
 
         // Auto-sync string columns from relational data for backward compatibility
@@ -174,12 +179,38 @@ class StudentController extends Controller
         // Update Grades
         if ($request->has('grades')) {
             foreach ($request->grades as $subject_id => $nilai) {
-                if ($nilai !== null) {
+                if ($nilai !== null && $nilai !== '') {
                     Grade::updateOrCreate(
                         ['student_id' => $student->id, 'subject_id' => $subject_id],
                         ['nilai' => $nilai]
                     );
                 }
+            }
+        }
+
+        // Final check for completeness of grades
+        // If status is 'lulus' but there are missing grades, change to 'lulus bersyarat'
+        if ($student->status_lulus === 'lulus') {
+            $applicableSubjects = Subject::where(function($query) use ($student) {
+                $query->whereNull('program_keahlian')->whereNull('konsentrasi_keahlian');
+                if ($student->program_keahlian) {
+                    $query->orWhere(function($subq) use ($student) {
+                        $subq->where('program_keahlian', $student->program_keahlian)
+                             ->whereNull('konsentrasi_keahlian');
+                    });
+                }
+                if ($student->konsentrasi_keahlian) {
+                    $query->orWhere('konsentrasi_keahlian', $student->konsentrasi_keahlian);
+                }
+            })->get();
+
+            $existingGradesCount = Grade::where('student_id', $student->id)
+                ->whereNotNull('nilai')
+                ->where('nilai', '!=', '')
+                ->count();
+
+            if ($existingGradesCount < $applicableSubjects->count()) {
+                $student->update(['status_lulus' => 'lulus bersyarat']);
             }
         }
 

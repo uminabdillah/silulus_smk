@@ -25,13 +25,13 @@ class SklController extends Controller
             return back()->with('error', 'Profil sekolah belum diisi di database.');
         }
 
-        if (!$student->status_lulus) {
-            return back()->with('error', 'Siswa ini belum dinyatakan Lulus.');
+        if ($student->status_lulus === 'tidak lulus') {
+            return back()->with('error', 'Siswa ini dinyatakan Tidak Lulus.');
         }
 
         // Menghitung Urutan Siswa (Penomoran surat dinamis)
         $allGraduates = Student::where('academic_year_id', $student->academic_year_id)
-                                ->where('status_lulus', true)
+                                ->whereIn('status_lulus', ['lulus', 'lulus bersyarat'])
                                 ->orderBy('nama_lengkap', 'asc')
                                 ->pluck('id');
         
@@ -87,7 +87,7 @@ class SklController extends Controller
             '{program_keahlian}' => $programKeahlian,
             '{konsentrasi_keahlian}' => $konsentrasiKeahlian,
             '{tanggal_pleno}' => $formatDateIndo($academicYear->tanggal_pleno),
-            '{lulus_tidak}' => 'L U L U S',
+            '{lulus_tidak}' => strtoupper($student->status_lulus),
             '{tanggal_kelulusan}' => $formatDateIndo($academicYear->tanggal_kelulusan),
             '{tahun_ajaran}' => $academicYear->tahun_ajaran ?? '-',
             '{nomor_skl}' => $nomor_skl ?? '-',

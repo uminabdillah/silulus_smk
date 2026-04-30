@@ -118,7 +118,7 @@ class StudentTemplateExport implements FromArray, WithHeadings, ShouldAutoSize, 
                 $sheet->getComment('C1')->getText()->createTextRun('WAJIB: Nama lengkap siswa');
                 $sheet->getComment('E1')->getText()->createTextRun('WAJIB: Kota/Kabupaten tempat lahir');
                 $sheet->getComment('F1')->getText()->createTextRun('WAJIB: Format tanggal YYYY-MM-DD (misal: 2005-08-17)');
-                $sheet->getComment('I1')->getText()->createTextRun('WAJIB: Tulis "Lulus" atau "Belum Lulus"');
+                $sheet->getComment('I1')->getText()->createTextRun('WAJIB: Tulis "Lulus", "Tidak Lulus", atau "Lulus Bersyarat"');
                 $sheet->getComment('J1')->getText()->createTextRun('Status rilis SKL: "1" = Rilis, "0" = Tahan (biarkan kosong = 0)');
 
                 // === BUILD HIDDEN REFERENCE DATA FOR DROPDOWNS ===
@@ -189,9 +189,10 @@ class StudentTemplateExport implements FromArray, WithHeadings, ShouldAutoSize, 
 
 
                 // 4. Status Lulus -> Column AD
-                $refStatus = '$AD$1:$AD$2';
+                $refStatus = '$AD$1:$AD$3';
                 $sheet->setCellValue("AD1", "Lulus");
-                $sheet->setCellValue("AD2", "Belum Lulus");
+                $sheet->setCellValue("AD2", "Tidak Lulus");
+                $sheet->setCellValue("AD3", "Lulus Bersyarat");
                 $sheet->getColumnDimension('AD')->setVisible(false);
 
 

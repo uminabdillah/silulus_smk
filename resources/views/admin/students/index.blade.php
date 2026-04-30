@@ -165,9 +165,13 @@
                                             <div class="text-xs text-gray-400">{{ $student->konsentrasi_keahlian ?? '-' }}</div>
                                         </td>
                                         <td class="px-6 py-4 border-none">
-                                            @if($student->status_lulus)
+                                            @if($student->status_lulus === 'lulus')
                                                 <span class="inline-flex items-center px-2.5 py-1 rounded text-[10px] font-black bg-emerald-100 text-emerald-800">
                                                     LULUS
+                                                </span>
+                                            @elseif($student->status_lulus === 'lulus bersyarat')
+                                                <span class="inline-flex items-center px-2.5 py-1 rounded text-[10px] font-black bg-amber-100 text-amber-800">
+                                                    LULUS BERSYARAT
                                                 </span>
                                             @else
                                                 <span class="inline-flex items-center px-2.5 py-1 rounded text-[10px] font-black bg-rose-100 text-rose-800">

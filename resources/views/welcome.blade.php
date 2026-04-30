@@ -167,9 +167,19 @@
         @else
             <!-- Result Page -->
             @php
-                $isLulus = $student->status_lulus;
-                $headerColor = $isLulus ? 'bg-blue-600' : 'bg-red-600';
-                $statusText = $isLulus ? 'SELAMAT! ANDA DINYATAKAN LULUS!' : 'MOHON MAAF, ANDA DINYATAKAN TIDAK LULUS.';
+                $statusLulus = $student->status_lulus;
+                $isLulus = in_array($statusLulus, ['lulus', 'lulus bersyarat']);
+                
+                if ($statusLulus === 'lulus') {
+                    $headerColor = 'bg-blue-600';
+                    $statusText = 'SELAMAT! ANDA DINYATAKAN LULUS!';
+                } elseif ($statusLulus === 'lulus bersyarat') {
+                    $headerColor = 'bg-amber-500';
+                    $statusText = 'SELAMAT! ANDA DINYATAKAN LULUS BERSYARAT!';
+                } else {
+                    $headerColor = 'bg-red-600';
+                    $statusText = 'MOHON MAAF, ANDA DINYATAKAN TIDAK LULUS.';
+                }
             @endphp
 
             <div class="bg-slate-900/90 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden">

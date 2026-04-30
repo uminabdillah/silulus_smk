@@ -10,7 +10,7 @@
     <div class="min-h-screen flex flex-col items-center justify-center pt-6 sm:pt-0 bg-gray-100">
         <div class="w-full sm:max-w-md mt-6 px-6 py-8 bg-white shadow-md overflow-hidden sm:rounded-lg text-center">
             
-            @if(isset($student) && $student->status_lulus)
+            @if(isset($student) && in_array($student->status_lulus, ['lulus', 'lulus bersyarat']))
                 <div class="mb-4">
                     <svg class="mx-auto h-16 w-16 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -38,7 +38,7 @@
                     </div>
                     <div>
                         <span class="block text-xs font-semibold text-gray-500 uppercase">Status</span>
-                        <span class="inline-block px-2 text-xs font-semibold leading-5 text-green-800 bg-green-100 rounded-full">LULUS</span>
+                        <span class="inline-block px-2 text-xs font-semibold leading-5 {{ $student->status_lulus === 'lulus' ? 'text-green-800 bg-green-100' : 'text-amber-800 bg-amber-100' }} rounded-full">{{ strtoupper($student->status_lulus) }}</span>
                     </div>
                 </div>
             @else
