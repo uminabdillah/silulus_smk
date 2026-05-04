@@ -41,7 +41,7 @@ class SchoolProfileController extends Controller
 
         $request->validate([
             'nama_sekolah' => 'required|string|max:255',
-            'npsn' => 'required|string|max:255',
+            'npsn' => 'nullable|string|max:255',
             'alamat' => 'nullable|string',
             'kabupaten' => 'nullable|string|max:255',
             'provinsi' => 'nullable|string|max:255',

@@ -184,6 +184,11 @@ class StudentController extends Controller
                         ['student_id' => $student->id, 'subject_id' => $subject_id],
                         ['nilai' => $nilai]
                     );
+                } else {
+                    // Jika nilai dikosongkan, hapus dari database
+                    Grade::where('student_id', $student->id)
+                         ->where('subject_id', $subject_id)
+                         ->delete();
                 }
             }
         }
