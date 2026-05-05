@@ -146,44 +146,10 @@ class ClassroomController extends Controller
             }
         }
 
-        // Final check for completeness of grades after save
-        // If status is 'lulus' but there are missing grades, change to 'lulus bersyarat'
-        $classroom->load(['students', 'majorProgram', 'majorConcentration']);
-        $programName = $classroom->majorProgram?->nama_program;
-        $concentrationName = $classroom->majorConcentration?->nama_konsentrasi;
-
-        // Fallback for names
-        if (!$programName || !$concentrationName) {
-            $studentSample = $classroom->students->first();
-            if ($studentSample) {
-                $programName = $programName ?? $studentSample->program_keahlian ?? $studentSample->majorProgram?->nama_program;
-                $concentrationName = $concentrationName ?? $studentSample->konsentrasi_keahlian ?? $studentSample->majorConcentration?->nama_konsentrasi;
-            }
-        }
-
-        $subjectsCount = Subject::where(function ($q) use ($programName, $concentrationName) {
-            $q->whereNull('program_keahlian')->whereNull('konsentrasi_keahlian');
-            if ($programName) {
-                $q->orWhere(function ($subQ) use ($programName) {
-                    $subQ->where('program_keahlian', $programName)->whereNull('konsentrasi_keahlian');
-                });
-            }
-            if ($concentrationName) {
-                $q->orWhere('konsentrasi_keahlian', $concentrationName);
-            }
-        })->count();
-
+        // Update Graduation Status for each student in the classroom
         foreach ($classroom->students as $student) {
-            if ($student->status_lulus === 'lulus') {
-                $existingGradesCount = Grade::where('student_id', $student->id)
-                    ->whereNotNull('nilai')
-                    ->where('nilai', '!=', '')
-                    ->count();
-
-                if ($existingGradesCount < $subjectsCount) {
-                    $student->update(['status_lulus' => 'lulus bersyarat']);
-                }
-            }
+            $student->refresh();
+            $student->updateGraduationStatus();
         }
 
         return back()->with('success', 'Nilai seluruh siswa di kelas ' . $classroom->nama_kelas . ' berhasil disimpan!');

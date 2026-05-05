@@ -81,18 +81,9 @@ class ClassroomGradesImport implements ToCollection, WithHeadingRow, SkipsEmptyR
         }
 
         // Final check for completeness of grades after import
-        // If status is 'lulus' but there are missing grades, change to 'lulus bersyarat'
         foreach ($students as $student) {
-            if ($student->status_lulus === 'lulus') {
-                $existingGradesCount = Grade::where('student_id', $student->id)
-                    ->whereNotNull('nilai')
-                    ->where('nilai', '!=', '')
-                    ->count();
-
-                if ($existingGradesCount < $this->subjects->count()) {
-                    $student->update(['status_lulus' => 'lulus bersyarat']);
-                }
-            }
+            $student->refresh();
+            $student->updateGraduationStatus();
         }
         
         // Restore standard heading formatting for other imports across the app

@@ -193,31 +193,9 @@ class StudentController extends Controller
             }
         }
 
-        // Final check for completeness of grades
-        // If status is 'lulus' but there are missing grades, change to 'lulus bersyarat'
-        if ($student->status_lulus === 'lulus') {
-            $applicableSubjects = Subject::where(function($query) use ($student) {
-                $query->whereNull('program_keahlian')->whereNull('konsentrasi_keahlian');
-                if ($student->program_keahlian) {
-                    $query->orWhere(function($subq) use ($student) {
-                        $subq->where('program_keahlian', $student->program_keahlian)
-                             ->whereNull('konsentrasi_keahlian');
-                    });
-                }
-                if ($student->konsentrasi_keahlian) {
-                    $query->orWhere('konsentrasi_keahlian', $student->konsentrasi_keahlian);
-                }
-            })->get();
-
-            $existingGradesCount = Grade::where('student_id', $student->id)
-                ->whereNotNull('nilai')
-                ->where('nilai', '!=', '')
-                ->count();
-
-            if ($existingGradesCount < $applicableSubjects->count()) {
-                $student->update(['status_lulus' => 'lulus bersyarat']);
-            }
-        }
+        // Update Graduation Status automatically
+        $student->refresh();
+        $student->updateGraduationStatus();
 
         return redirect()->route('students.index')->with('success', 'Data siswa dan nilai berhasil diperbarui!');
     }
