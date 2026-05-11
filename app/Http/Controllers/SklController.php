@@ -10,23 +10,86 @@ use App\Models\Subject;
 use App\Models\Grade;
 use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade\Pdf;
+use ZipArchive;
 
 class SklController extends Controller
 {
     public function download(Student $student)
     {
+        try {
+            $pdf = $this->generatePdf($student);
+            return $pdf->download('SKL_' . $student->nisn . '_' . $student->nama_lengkap . '.pdf');
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
+
+    public function bulkDownload(Request $request)
+    {
+        $ids = $request->ids;
+        if (!$ids || count($ids) === 0) {
+            return back()->with('error', 'Pilih minimal satu siswa.');
+        }
+
+        $students = Student::whereIn('id', $ids)->get();
+        
+        $zip = new ZipArchive();
+        $zipFileName = 'SKL_Massal_' . date('YmdHis') . '.zip';
+        $zipFilePath = storage_path('app/public/' . $zipFileName);
+
+        // Ensure directory exists
+        if (!file_exists(storage_path('app/public'))) {
+            mkdir(storage_path('app/public'), 0755, true);
+        }
+
+        if ($zip->open($zipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === TRUE) {
+            $count = 0;
+            foreach ($students as $student) {
+                if ($student->status_lulus === 'tidak lulus') continue;
+
+                try {
+                    $pdf = $this->generatePdf($student);
+                    // Sanitasi nama file untuk ZIP
+                    $safeName = str_replace(['/', '\\', '?', '%', '*', ':', '|', '"', '<', '>', ' '], '_', $student->nama_lengkap);
+                    $fileName = 'SKL_' . $student->nisn . '_' . $safeName . '.pdf';
+                    $zip->addFromString($fileName, $pdf->output());
+                    $count++;
+                } catch (\Exception $e) {
+                    // Skip if error occurs for a single student
+                    continue;
+                }
+            }
+            $zip->close();
+
+            if ($count === 0) {
+                if (file_exists($zipFilePath)) unlink($zipFilePath);
+                return back()->with('error', 'Tidak ada SKL yang valid untuk diunduh (mungkin siswa terpilih berstatus Tidak Lulus).');
+            }
+        } else {
+            return back()->with('error', 'Gagal membuat file ZIP.');
+        }
+
+        if (file_exists($zipFilePath)) {
+            return response()->download($zipFilePath)->deleteFileAfterSend(true);
+        }
+
+        return back()->with('error', 'Terjadi kesalahan saat menyiapkan file unduhan.');
+    }
+
+    private function generatePdf(Student $student)
+    {
         $academicYear = AcademicYear::where('is_active', true)->first();
         if (!$academicYear) {
-            return back()->with('error', 'Tahun ajaran aktif belum diatur di menu Pengaturan.');
+            throw new \Exception('Tahun ajaran aktif belum diatur di menu Pengaturan.');
         }
 
         $school = SchoolProfile::first();
         if (!$school) {
-            return back()->with('error', 'Profil sekolah belum diisi di database.');
+            throw new \Exception('Profil sekolah belum diisi di database.');
         }
 
         if ($student->status_lulus === 'tidak lulus') {
-            return back()->with('error', 'Siswa ini dinyatakan Tidak Lulus.');
+            throw new \Exception('Siswa ini dinyatakan Tidak Lulus.');
         }
 
         // Menghitung Urutan Siswa (Penomoran surat dinamis)
@@ -41,7 +104,7 @@ class SklController extends Controller
         $nomorSklMentah = $academicYear->nomor_skl_template ?? '-';
         $nomor_skl = str_replace('{nomor_urut}', $paddedIndex, $nomorSklMentah);
 
-        // QR Code Generation (bypassing Imagick via external API)
+        // QR Code Generation
         $qrDir = Storage::disk('public')->path('qr');
         if (!file_exists($qrDir)) mkdir($qrDir, 0755, true);
         
@@ -49,8 +112,10 @@ class SklController extends Controller
         
         if (!file_exists($qrCodePath)) {
             $qrDataUrl = route('verify.skl', $student->nisn);
-            $qrImage = file_get_contents('https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' . urlencode($qrDataUrl));
-            file_put_contents($qrCodePath, $qrImage);
+            $qrImage = @file_get_contents('https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' . urlencode($qrDataUrl));
+            if ($qrImage) {
+                file_put_contents($qrCodePath, $qrImage);
+            }
         }
 
         // Date Helper (Indonesian)
@@ -71,12 +136,10 @@ class SklController extends Controller
         $template = \App\Models\SklTemplate::first();
         $rawHtml = $template ? $template->content : '<p>Admin belum mengkonfigurasi Template SKL.</p>';
         
-        // Resolve jurusan from relational data (SMK) or fallback to string (SMA/legacy)
         $student->load('majorProgram', 'majorConcentration');
         $programKeahlian = $student->majorProgram?->nama_program ?? $student->program_keahlian ?? '-';
         $konsentrasiKeahlian = $student->majorConcentration?->nama_konsentrasi ?? $student->konsentrasi_keahlian ?? '-';
 
-        // Define replacement map
         $replacements = [
             '{nama_sekolah}' => $school->nama_sekolah ?? '-',
             '{npsn_sekolah}' => $school->npsn ?? '-',
@@ -100,11 +163,10 @@ class SklController extends Controller
 
         $body_content = str_replace(array_keys($replacements), array_values($replacements), $rawHtml);
 
-        // Generate PDF using Laravel Wrapper (Size: F4)
         $pdf = Pdf::loadView('pdf.skl', compact('student', 'school', 'academicYear', 'nomor_skl', 'qrCodePath', 'body_content'));
         $pdf->setPaper(array(0, 0, 609.4488, 935.433), 'portrait');
 
-        return $pdf->download('SKL_' . $student->nisn . '_' . $student->nama_lengkap . '.pdf');
+        return $pdf;
     }
 
     private function generateGradeTable(Student $student)

@@ -69,6 +69,9 @@
                             🔒 Hold
                         </button>
                         
+                        <button @click="submitBulk('{{ route('students.bulk_download_skl') }}')" class="bg-emerald-600 text-white px-3 py-1 rounded text-xs font-bold hover:bg-emerald-500 transition flex items-center gap-1">
+                            📄 Download SKL
+                        </button>
                         <button @click="submitBulk('{{ route('students.bulk_delete') }}')" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs font-bold transition flex items-center gap-1">
                             🗑️ Hapus Permanen
                         </button>

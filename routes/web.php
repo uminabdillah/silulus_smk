@@ -48,6 +48,7 @@ Route::middleware('auth')->group(function () {
     Route::post('students/import', [StudentController::class, 'import'])->name('students.import');
     Route::post('students/bulk-release', [StudentController::class, 'bulkRelease'])->name('students.bulk_release');
     Route::post('students/bulk-hold', [StudentController::class, 'bulkHold'])->name('students.bulk_hold');
+    Route::post('students/bulk-download-skl', [SklController::class, 'bulkDownload'])->name('students.bulk_download_skl');
     Route::post('students/bulk-delete', [StudentController::class, 'bulkDelete'])->name('students.bulk_delete');
     Route::patch('students/{student}/toggle-release', [StudentController::class, 'toggleRelease'])->name('students.toggle_release');
     Route::resource('students', StudentController::class);
